@@ -1,22 +1,23 @@
 require "./board.rb"
 
 class Game
-  def play(size = 9, bombs = 1)
+  def play(size = 9, bombs = 20)
     board = Board.new(size,bombs)
 
     until board.victory?
-    #  begin
+      begin
+        system 'clear'
         board.show_board
         print ">> "
         board.instance_eval(gets.chomp)
-     # rescue Exception => msg
-        # if msg == "bomb touched"
-    #       puts "You lose :("
-    #       return
-    #     else
-    #       throw msg
-    #     end
-    #     #end
+      rescue RuntimeError => msg
+        if msg.message == "bomb touched"
+          puts "You lose :("
+          return
+        else
+          p msg
+        end
+      end
     end
     puts "You win :)"
   end

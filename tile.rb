@@ -11,7 +11,7 @@ class Tile
     @display_char = "*"
   end
 
-  def show
+  def to_s
     @display_char
   end
 
@@ -36,7 +36,7 @@ class Tile
     @revealed = true
 
     if is_bomb?
-      throw "bomb touched"
+      raise "bomb touched"
     end
 
     if neighbor_bomb_count == 0
@@ -61,7 +61,7 @@ class Tile
     @flagged = false
   end
 
-  def get_tile_at(x,y)
+  def get_tile_at(x, y)
     @parent[x, y]
   end
 
