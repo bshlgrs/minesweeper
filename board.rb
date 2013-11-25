@@ -1,6 +1,8 @@
 require "./tile.rb"
 
 class Board
+  attr_accessor :mines_field
+
   def initialize(board_size, number_of_bombs)
 
     bombed_squares = []
@@ -14,8 +16,8 @@ class Board
     (0...board_size).each do |row|
       new_row = []
       (0...board_size).each do |column|
-        new_row << Tile.new(bombed_squares.include?([row, column]),
-                                                    [row,column],self)
+        new_row << Tile.new(bombed_squares.include?([column,row]),
+                                                    [column,row],self)
       end
       @mines_field << new_row
     end
@@ -28,8 +30,26 @@ class Board
       end
       puts
     end
+    puts
+  end
+
+  def reveal(pos)
+    x,y = pos
+    @mines_field[y][x].reveal
+  end
+
+  def [](x, y)
+    return nil unless x >= 0 && y >= 0
+    return nil unless x < @mines_field.length && y < @mines_field.length
+    @mines_field[y][x]
   end
 end
 
-b = Board.new(9,10)
+b = Board.new(9,5)
 b.show_board
+
+while true
+  x,y = eval("[#{gets.chomp}]")
+  b.reveal([x,y])
+  b.show_board
+end

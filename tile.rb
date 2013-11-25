@@ -28,7 +28,12 @@ class Tile
     @bomb
   end
 
+  def inspect
+    "tile (#{@pos}) bomb: #{@bomb}"
+  end
+
   def reveal
+    return if @revealed
     @revealed = true
 
     if is_bomb?
@@ -37,17 +42,18 @@ class Tile
 
     if neighbor_bomb_count == 0
       @display_char = "_"
+      neighbors.each do |neighbor|
+        next if neighbor.is_bomb? || neighbor.revealed?
+        neighbor.reveal
+      end
     else
       @display_char = neighbor_bomb_count.to_s
     end
 
-    neighbors.each do |neighbor|
-      neighbor.reveal
-    end
   end
 
   def get_tile_at(x,y)
-    parent[y][x] rescue nil
+    @parent[x, y]
   end
 
   def neighbors
@@ -57,7 +63,7 @@ class Tile
       (x - 1..x + 1).each do |x|
         tile = get_tile_at(x, y)
         next if tile.nil?
-        neighbor << tile unless tile == self
+        neighbors << tile unless tile == self
       end
     end
     neighbors
