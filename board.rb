@@ -5,18 +5,19 @@ class Board
 
   def initialize(board_size, number_of_bombs)
 
-    bombed_squares = []
+    @board_size = board_size
+    @bombed_tiles = []
 
-    until bombed_squares.count == number_of_bombs
+    until @bombed_tiles.count == number_of_bombs
       new_bomb = [rand(board_size), rand(board_size)]
-      bombed_squares << new_bomb unless bombed_squares.include? new_bomb
+      @bombed_tiles << new_bomb unless @bombed_tiles.include? new_bomb
     end
 
     @mines_field = []
     (0...board_size).each do |row|
       new_row = []
       (0...board_size).each do |column|
-        new_row << Tile.new(bombed_squares.include?([column,row]),
+        new_row << Tile.new(@bombed_tiles.include?([column,row]),
                                                     [column,row],self)
       end
       @mines_field << new_row
@@ -24,7 +25,10 @@ class Board
   end
 
   def show_board
-    @mines_field.each do |row|
+    puts "  012345678"
+    puts
+    @mines_field.each_with_index do |row,index|
+      print "#{index} "
       row.each do |tile|
         print tile.show
       end
@@ -35,7 +39,17 @@ class Board
 
   def reveal(pos)
     x,y = pos
-    @mines_field[y][x].reveal
+    self[x, y].reveal
+  end
+
+  def flag(pos)
+    x,y = pos
+    self[x, y].flag
+  end
+
+  def unflag(pos)
+    x,y = pos
+    self[x, y].unflag
   end
 
   def [](x, y)
@@ -43,13 +57,15 @@ class Board
     return nil unless x < @mines_field.length && y < @mines_field.length
     @mines_field[y][x]
   end
-end
 
-b = Board.new(9,5)
-b.show_board
+  def victory?
+    (0...@board_size).each do |row|
+      (0...@board_size).each do |column|
+        tile = self[column, row]
+        return false unless tile.flagged? == tile.is_bomb?
+      end
+    end
+    return true
+  end
 
-while true
-  x,y = eval("[#{gets.chomp}]")
-  b.reveal([x,y])
-  b.show_board
 end

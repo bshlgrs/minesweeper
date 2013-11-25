@@ -12,7 +12,6 @@ class Tile
   end
 
   def show
-    return "b" if is_bomb?
     @display_char
   end
 
@@ -33,7 +32,7 @@ class Tile
   end
 
   def reveal
-    return if @revealed
+    return if revealed? || flagged?
     @revealed = true
 
     if is_bomb?
@@ -49,7 +48,17 @@ class Tile
     else
       @display_char = neighbor_bomb_count.to_s
     end
+  end
 
+  def flag
+    return if revealed?
+    @display_char = "F"
+    @flagged = true
+  end
+
+  def unflag
+    @display_char = "*"
+    @flagged = false
   end
 
   def get_tile_at(x,y)
