@@ -8,6 +8,12 @@ class Tile
     @parent = parent
     @flagged = false
     @revealed = false
+    @display_char = "*"
+  end
+
+  def show
+    return "b" if is_bomb?
+    @display_char
   end
 
   def flagged?
@@ -24,6 +30,20 @@ class Tile
 
   def reveal
     @revealed = true
+
+    if is_bomb?
+      throw "bomb touched"
+    end
+
+    if neighbor_bomb_count == 0
+      @display_char = "_"
+    else
+      @display_char = neighbor_bomb_count.to_s
+    end
+
+    neighbors.each do |neighbor|
+      neighbor.reveal
+    end
   end
 
   def get_tile_at(x,y)
@@ -46,5 +66,4 @@ class Tile
   def neighbor_bomb_count
     neighbors.select(&:is_bomb?).length
   end
-
 end
