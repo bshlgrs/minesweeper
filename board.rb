@@ -2,7 +2,7 @@ require "./tile.rb"
 require "yaml"
 
 class Board
-  attr_accessor :mines_field
+  attr_accessor :mines_field, :cursor_x, :cursor_y
 
   def initialize(board_size, number_of_bombs)
 
@@ -11,6 +11,8 @@ class Board
     make_bombs(number_of_bombs)
     make_tiles
     @start_time = Time.now.to_i
+
+    @cursor_x, @cursor_y = 0, 0
   end
 
   def make_bombs(number_of_bombs)
@@ -48,22 +50,36 @@ class Board
       end
       puts
     end
+    p [cursor_x, cursor_y]
     puts
   end
 
-  def reveal(pos)
-    x, y = pos
-    self[x, y].reveal
+  def reveal
+    self[cursor_x, cursor_y].reveal
   end
 
-  def flag(pos)
-    x, y = pos
-    self[x, y].flag
+  def flag
+    self[cursor_x, cursor_y].flag
   end
 
   def unflag(pos)
-    x, y = pos
-    self[x, y].unflag
+    self[cursor_x, cursor_y].unflag
+  end
+
+  def left
+    self.cursor_x -= 1
+  end
+
+  def right
+    self.cursor_x += 1
+  end
+
+  def up
+    self.cursor_y -= 1
+  end
+
+  def down
+    self.cursor_y += 1
   end
 
   def [](x, y)

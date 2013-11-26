@@ -8,11 +8,15 @@ class Tile
     @parent = parent
     @flagged = false
     @revealed = false
-    @display_char = "*"
+    @display_char = "\u25FB"
   end
 
   def to_s
-    @display_char
+    if pos == [@parent.cursor_x, @parent.cursor_y]
+      "\u25B3"
+    else
+      @display_char
+    end
   end
 
   def flagged?
@@ -42,7 +46,6 @@ class Tile
     if neighbor_bomb_count == 0
       @display_char = "_"
       neighbors.each do |neighbor|
-        next if neighbor.is_bomb? || neighbor.revealed?
         neighbor.reveal
       end
     else
@@ -52,7 +55,7 @@ class Tile
 
   def flag
     return if revealed?
-    @display_char = "F"
+    @display_char = "\u2691"
     @flagged = true
   end
 
@@ -67,7 +70,7 @@ class Tile
 
   def neighbors
     neighbors = []
-    x,y = pos
+    x, y = pos
     (y - 1..y + 1).each do |y|
       (x - 1..x + 1).each do |x|
         tile = get_tile_at(x, y)

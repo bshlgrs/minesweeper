@@ -1,19 +1,41 @@
+$high_scores = []
+
 require "./board.rb"
 require "yaml"
 require "debugger"
 
 class Game
-  def play(size = 5, bombs = 1)
+  def play(size = 9, bombs = 10)
     board = get_board(size,bombs)
 
     until board.victory?
+      system 'clear'
+      board.show_board
+      char = ""
       begin
-        system 'clear'
-        board.show_board
-        print ">> "
+        system("stty raw -echo")
+        char = STDIN.getc
+      ensure
+        system("stty -raw echo")
+      end
 
-        input = $stdin.gets.chomp
-        board.instance_eval(input)
+      begin
+        case char
+        when "w"
+          board.up
+        when "a"
+          board.left
+        when "s"
+          board.down
+        when "d"
+          board.right
+        when "f"
+          board.flag
+        when " "
+          board.reveal
+        end
+
+
       rescue RuntimeError => msg
         if msg.message == "bomb touched"
           puts "You lose :("
@@ -40,17 +62,21 @@ end
 
 def victory_message(board)
   time_taken = board.time_taken
-  high_scores = YAML::load_file("high_scores")
-  high_scores << time_taken
-  high_scores = high_scores.sort.take(10)
+
+  $high_scores << time_taken
+  $high_scores = $high_scores.sort.take(10)
 
   puts "You win :)"
   puts "You took #{time_taken} seconds."
   puts "Best times:"
-  puts high_scores
+  puts $high_scores
 
-  File.open("high_scores", "w") do |f|
-    f.puts high_scores.to_yaml
+  this_code = File.readlines("game.rb")
+  this_code.shift
+  this_code.unshift("$high_scores = #{$high_scores.inspect}\n")
+
+  File.open("game.rb", "w") do |f|
+    f.puts(this_code.join(""))
   end
 end
 
