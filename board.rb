@@ -1,4 +1,5 @@
 require "./tile.rb"
+require "yaml"
 
 class Board
   attr_accessor :mines_field
@@ -9,7 +10,7 @@ class Board
 
     make_bombs(number_of_bombs)
     make_tiles
-
+    @start_time = Time.now.to_i
   end
 
   def make_bombs(number_of_bombs)
@@ -81,4 +82,22 @@ class Board
     true
   end
 
+  def save(filename)
+    @time_taken = Time.now.to_i - @start_time
+    File.open(filename, "w") do |f|
+      f.puts self.to_yaml
+    end
+  end
+
+  def reload_time
+    @start_time = Time.now.to_i - @time_taken
+  end
+
+  def time_taken
+    Time.now.to_i - @start_time
+  end
+
+  def quit
+    exit(0)
+  end
 end
